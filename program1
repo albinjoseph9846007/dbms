@@ -1,0 +1,134 @@
+(base) [root@dbcpc19 dbms]# service postgresql restart
+Redirecting to /bin/systemctl restart postgresql.service
+(base) [root@dbcpc19 dbms]# su - postgres
+Last login: Mon Nov 21 15:27:43 +07 2022 on pts/0
+-bash-4.2$ psql
+psql (9.2.24)
+Type "help" for help.
+
+postgres=# create database university;
+CREATE DATABASE
+postgres=# \c university;
+You are now connected to database "university" as user "postgres".
+
+university=# create table department(d_id int not null primary key,name varchar(20),phone bigint,email varchar(20),d_no int,hod varchar(20),hod_id int);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "department_pkey" for table "department"
+CREATE TABLE
+university=# insert into department values(1001,'MCA',9946368345,'qwerty@gmail.com',101,'xyz','111');
+INSERT 0 1
+university=# insert into department values(1002,'M Com',123456789,'qwewsd@gmail.com',102,'qwe','222');
+INSERT 0 1
+university=# insert into department values(1003,'MSW',9874563210,'zxewsd@gmail.com',103,'zxc','333');
+INSERT 0 1
+university=# insert into department values(1004,'M Tech',8527410963,'poiwsd@gmail.com',104,'edc','444');
+INSERT 0 1
+university=# insert into department values(1005,'MA English',7410852963,'mnbvcxz@gmail.com',105,'llok','555');
+INSERT 0 1
+
+
+
+university=# create table student(s_id int not null primary key,s_name varchar(20),address varchar(50),age int,gender varchar(2),d_id int,foreign key(d_id) references department(d_id));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "student_pkey" for table "student"
+CREATE TABLE
+
+university=# insert into student values('10001','amitha','firei','22','f','1001');
+INSERT 0 1
+university=# insert into student values('10002','anu','qwsdf','20','f','1002');
+INSERT 0 1
+
+university=# insert into student values('10003','albin','qwsdf','23','m','1003');
+INSERT 0 1
+university=# insert into student values('10004','jibin','poiuyt','22','m','1004');
+INSERT 0 1
+university=# insert into student values('10005','navaneeth','zxcvbn','24','m','1005');
+INSERT 0 1
+
+
+university=# create table course(course_id int not null primary key,c_name varchar(20),d_no int,foreign key(d_no) references department(d_id));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "course_pkey" for table "course"
+CREATE TABLE
+
+university=# insert into course values(1101,'Python',1001);
+INSERT 0 1
+university=# insert into course values(1102,'Java',1002);
+INSERT 0 1
+university=# insert into course values(1103,'Social work',1003);
+INSERT 0 1
+university=# insert into course values(1104,'AI',1004);
+INSERT 0 1
+university=# insert into course values(1105,'History of english',1005);
+INSERT 0 1
+
+
+
+university=# create table student_course(s_id int,course_id int,foreign key(s_id) references student(s_id),foreign key(course_id) references course(course_id));
+CREATE TABLE
+
+university=# insert into student_course values(10001,1101);
+INSERT 0 1
+university=# insert into student_course values(10002,1102);
+INSERT 0 1
+university=# insert into student_course values(10003,1103);
+INSERT 0 1
+university=# insert into student_course values(10004,1104);
+INSERT 0 1
+university=# insert into student_course values(10005,1105);
+INSERT 0 1
+
+
+
+university=# create table faculty(f_id int not null primary key,f_name varchar(20),gender varchar(20),age int,address varchar(20),course varchar(20),d_id int,foreign key(d_id) references department(d_id),course_id int,foreign key(course_id) references course(course_id));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "faculty_pkey" for table "faculty"
+CREATE TABLE
+
+university=# insert into faculty values(9001,'qwerty','m',45,'zxcvbnmlkjh','Python',1001,1101);
+INSERT 0 1
+university=# insert into faculty values(9002,'asdfghj','f',49,'gshfvbnmlkjh','java',1002,1102);
+INSERT 0 1
+university=# insert into faculty values(9003,'zxcvb','m',52,'qwevbnmlkjh','Social work',1003,1103);
+INSERT 0 1
+university=# insert into faculty values(9004,'poiuyt','f',36,'polvbnmlkjh','AI',1004,1104);
+INSERT 0 1
+university=# insert into faculty values(9005,'mnbvcxz','m',29,'mnhggyji','History of english',1005,1105);
+INSERT 0 1
+
+
+
+university=# create table project(p_no int not null primary key,p_name varchar(20));
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "project_pkey" for table "project"
+CREATE TABLE
+
+university=# insert into project values(3001,'python');
+INSERT 0 1
+university=# insert into project values(3002,'Form validation');
+INSERT 0 1
+university=# insert into project values(3003,'Social wellfare');
+INSERT 0 1
+university=# insert into project values(3004,'Neural networking');
+INSERT 0 1
+university=# insert into project values(3005,'Drama');
+INSERT 0 1
+
+
+
+1. List the name of the students along with the course name.
+university=# select s.s_name,d.name from department d right outer join student s on s.d_id=d.d_id;
+
+
+
+
+2. List the name of the student who studies more than 1 course.
+
+university=# select s.s_name from student s, student_course sc where s.s_id=sc.s_id group by s.s_name having count(course_id)>1;
+
+
+3. List the name of the student who was taught by a particular faculty.
+university=# select s.s_name from student s full outer join faculty f on s.d_id=f.d_id where f.f_name='qwerty';
+
+4. List the name of the faculties who teaches particular course.
+
+
+5. List the name of the course and number of students in each course.
+
+6. Create a trigger which will display a warning message while you entering
+age less than Zero.
